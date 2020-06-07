@@ -14,11 +14,11 @@ int main()
 
 	if (found_devs > 0)
 	{
-		if (SCIDK_ConnectUSB(devices[0].SN, &handle) == NI_OK)
+		if (SCIDK_ConnectUSB("0001", &handle) == NI_OK)
 		{
 			NI_ReadReg(&reg_value, 0xFFFFFFFF, handle);
 			printf("Reg value: %X\n", reg_value);
-			NI_WriteReg(0x100, 0, handle);
+			NI_WriteReg(0x000, 0, handle);
 			NI_ReadReg(&reg_value, 0, handle);
 			printf("Reg 0 value: %X\n", reg_value);
 			NI_WriteReg(0xFF, 1, handle);
