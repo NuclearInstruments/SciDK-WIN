@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <windows.h>
+
 #include "ftd2xx.h"
 #include<iostream>
 #include <time.h>
@@ -27,7 +27,7 @@ namespace NIUSBPHY
 		i=1;
 		return;
 	}
-	NI_RESULT NI_USBPHY::EnumerateUsbDevice (tUSBDevice *pvArg1, unsigned int *numDevs)
+NI_RESULT NI_USBPHY::EnumerateUsbDevice (char *pvArg1, char *board_model, unsigned int *numDevs)
 {
 
 	char Buffer[255];
@@ -37,24 +37,24 @@ namespace NIUSBPHY
 	int q = 0;
 
 	ftStatus = FT_ListDevices(&count, NULL, FT_LIST_NUMBER_ONLY);
-
+	pvArg1[0] = '\0';
 	if (ftStatus == FT_OK)
 	{
 
 		for (i=0;i<count;i++)
 		{
-			FT_ListDevices((PVOID)i, Buffer, FT_LIST_BY_INDEX | FT_OPEN_BY_SERIAL_NUMBER);
+			FT_ListDevices((PVOID)i, Buffer, FT_LIST_BY_INDEX | FT_OPEN_BY_DESCRIPTION);
 			if (ftStatus == FT_OK) {
-				strcpy_s(pvArg1[q].SN, Buffer);
-				FT_ListDevices((PVOID)i, Buffer, FT_LIST_BY_INDEX | FT_OPEN_BY_DESCRIPTION);
-				if (ftStatus == FT_OK) {
-					strcpy_s(pvArg1[q].DESC, Buffer);
-					q++;
-				}	
-			}
-			else {
-
-			}			
+				if (strcmp(Buffer, board_model)==0)
+				{
+					FT_ListDevices((PVOID)i, Buffer, FT_LIST_BY_INDEX | FT_OPEN_BY_SERIAL_NUMBER);
+					if (ftStatus == FT_OK) {
+						sprintf(pvArg1, "%s%s;", pvArg1, Buffer);
+						q++;
+					}
+					
+				}
+			}		
 		}
 	}
 	else
@@ -62,8 +62,13 @@ namespace NIUSBPHY
 		return NI_ERROR_INTERFACE;
 	}
 
+	//remove last ;
+	if (q > 0)
+		pvArg1[strlen(pvArg1) - 1] = '\0';
+
 	*numDevs = q;
 
+	return NI_OK;
 }
 
 
@@ -107,7 +112,7 @@ NI_RESULT NI_USBPHY::CloseConnection ()
 		return NI_ERROR_INTERFACE;
 	}
 }
-NI_RESULT NI_USBPHY::WriteToFPGA (unsigned int *d, unsigned int addr, unsigned int length)
+NI_RESULT NI_USBPHY::WriteToFPGA (unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms)
 {
 		unsigned char h[200];
 		unsigned int ll;
@@ -137,7 +142,12 @@ NI_RESULT NI_USBPHY::WriteToFPGA (unsigned int *d, unsigned int addr, unsigned i
 		h[0] = 0xFF;
 		h[1] = 0x00;
 		h[2] = 0xAB;
-		h[3] = 0xF0;
+		
+		if (BusMode==0)
+			h[3] = 0xF0;
+		else
+			h[3] = 0xF2;
+
 		h[4] = (aa >> 24) & 0xFF;
 		h[5] = (aa >> 16) & 0xFF;
 		h[6] = (aa >> 8) & 0xFF;
@@ -166,7 +176,7 @@ NI_RESULT NI_USBPHY::WriteToFPGA (unsigned int *d, unsigned int addr, unsigned i
 }
 
 
-NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned int length)
+NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms)
 {
 		unsigned char h[200];
 		unsigned int ll;
@@ -198,7 +208,11 @@ NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned 
 		h[0] = 0xFF;
 		h[1] = 0x00;
 		h[2] = 0xAB;
-		h[3] = 0xF1;
+		if (BusMode == 0)
+			h[3] = 0xF1;
+		else
+			h[3] = 0xF3;
+
 		h[4] = (aa >> 24) & 0xFF;
 		h[5] = (aa >> 16) & 0xFF;
 		h[6] = (aa >> 8) & 0xFF;
@@ -227,14 +241,14 @@ NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned 
 NI_RESULT NI_USBPHY::WriteReg (unsigned int regVal, unsigned int addr)
 {
 
-	return WriteToFPGA(&regVal, addr,1);
+	return WriteToFPGA(&regVal, addr,1,0,1);
 
 }
 
 NI_RESULT NI_USBPHY::ReadReg (unsigned int *regVal, unsigned int addr)
 {
 
-	return ReadFromFPGA(regVal, addr,1);
+	return ReadFromFPGA(regVal, addr,1, 0, 4);
 
 }
 

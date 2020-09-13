@@ -1,9 +1,9 @@
 #ifndef __NIERRORCODE_H
 #define __NIERRORCODE_H
+#include <stdint.h>
 
-#include <windows.h>
 #pragma once
-typedef ULONG	NI_RESULT;
+typedef uint32_t	NI_RESULT;
 
 #define		NI_OK									0x00000000
 #define		NI_ERROR_GENERIC						0x00000001
@@ -15,7 +15,7 @@ typedef ULONG	NI_RESULT;
 #define		NI_TOO_MANY_DEVICES_CONNECTED			0x00000007
 #define		NI_INVALID_HANDLE						0x00000008
 
-typedef ULONG	NI_STATUS;
+typedef uint32_t	NI_STATUS;
 #define		NI_ONLINE				0x00000000
 #define		NI_ERROR				0x00000001
 #define		NI_OFFLINE				0x00000002

@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SCIDK_Lib", "SciDK_Lib\SCID
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SCIDK_TestApp", "SCIDK_TestApp\SCIDK_TestApp.vcxproj", "{E84344E9-F9AA-412F-9E5E-0D2D39E2FC46}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SCIDK_FirmwareUpgrade", "SCIDK_FirmwareUpgrade\SCIDK_FirmwareUpgrade.vcxproj", "{7833DABD-3A70-4E80-9156-008590B2A60F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,14 @@ Global
 		{E84344E9-F9AA-412F-9E5E-0D2D39E2FC46}.Release|Win32.Build.0 = Release|Win32
 		{E84344E9-F9AA-412F-9E5E-0D2D39E2FC46}.Release|x64.ActiveCfg = Release|x64
 		{E84344E9-F9AA-412F-9E5E-0D2D39E2FC46}.Release|x64.Build.0 = Release|x64
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Debug|Win32.Build.0 = Debug|Win32
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Debug|x64.ActiveCfg = Debug|x64
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Debug|x64.Build.0 = Debug|x64
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Release|Win32.ActiveCfg = Release|Win32
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Release|Win32.Build.0 = Release|Win32
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Release|x64.ActiveCfg = Release|x64
+		{7833DABD-3A70-4E80-9156-008590B2A60F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

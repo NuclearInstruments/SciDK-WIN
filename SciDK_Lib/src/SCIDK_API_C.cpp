@@ -14,7 +14,7 @@ struct
 
 
 
-SCIDK_API NI_RESULT SCIDK_ConnectUSB(char *SN, int *handle)
+SCIDK_API NI_RESULT SCIDK_ConnectUSB(char *SN, NI_HANDLE *handle)
 {
 	int newdevid;
    
@@ -45,6 +45,16 @@ SCIDK_API NI_RESULT SCIDK_ConnectUSB(char *SN, int *handle)
 				Devices[*handle].valid = 1;
 				NI_RESULT Status;
 				Devices[*handle].SN = atoi(SN);
+
+				uint32_t value;
+
+				NI_WriteReg(0,
+					0xFFFFFFFF,
+					 handle);
+
+				NI_ReadReg(&value,
+					0xFFFFFFFF,
+					handle);
 				return NI_OK;
 			}
 		
@@ -57,13 +67,13 @@ SCIDK_API NI_RESULT SCIDK_ConnectUSB(char *SN, int *handle)
 	
 }
 
-SCIDK_API NI_RESULT NI_CloseConnection(int handle)
+SCIDK_API NI_RESULT NI_CloseConnection(NI_HANDLE *handle)
 {
-	if (Devices[handle].valid == 1)
+	if (Devices[*handle].valid == 1)
 	{
-		Devices[handle].valid = 0;
-		Devices[handle].niSciDK_HAL->CloseConnection ();
-		delete Devices[handle].niSciDK_HAL;
+		Devices[*handle].valid = 0;
+		Devices[*handle].niSciDK_HAL->CloseConnection ();
+		delete Devices[*handle].niSciDK_HAL;
 		return NI_OK;
 	}
 	else
@@ -75,22 +85,22 @@ SCIDK_API NI_RESULT NI_CloseConnection(int handle)
 
 
 
-SCIDK_API NI_RESULT NI_USBEnumerate( tUSBDevice *pvArg1, unsigned int *numDevs	)
+SCIDK_API NI_RESULT NI_USBEnumerate( char *pvArg1, char* board_model, unsigned int *numDevs	)
 {
 	NI_USBPHY enumClass;
-	return enumClass.EnumerateUsbDevice(pvArg1,numDevs);
+	return enumClass.EnumerateUsbDevice(pvArg1, board_model, numDevs);
 }
 
 
 
-SCIDK_API NI_RESULT NI_WriteReg(UINT32 value, 
-									  UINT32 address,
-									  int handle	)
+SCIDK_API NI_RESULT NI_WriteReg(uint32_t value, 
+									  uint32_t address,
+	NI_HANDLE * handle	)
 {
 	NI_RESULT Status;
-	if (Devices[handle].valid == 1)
+	if (Devices[*handle].valid == 1)
 	{
-		Status = Devices[handle].niSciDK_HAL->WriteReg(value, address);
+		Status = Devices[*handle].niSciDK_HAL->WriteReg(value, address);
 		return Status;
 	}
 	else
@@ -99,14 +109,14 @@ SCIDK_API NI_RESULT NI_WriteReg(UINT32 value,
 	}
 }
 
-SCIDK_API NI_RESULT NI_ReadReg(UINT32 *value, 
-									  UINT32 address,
-									  int handle	)
+SCIDK_API NI_RESULT NI_ReadReg(uint32_t *value, 
+									  uint32_t address,
+	NI_HANDLE * handle	)
 {
 	NI_RESULT Status;
-	if (Devices[handle].valid == 1)
+	if (Devices[*handle].valid == 1)
 	{
-		Status = Devices[handle].niSciDK_HAL->ReadReg(value, address);
+		Status = Devices[*handle].niSciDK_HAL->ReadReg(value, address);
 		return Status;
 	}
 	else
@@ -115,15 +125,19 @@ SCIDK_API NI_RESULT NI_ReadReg(UINT32 *value,
 	}
 }
 
-SCIDK_API NI_RESULT NI_WriteData(UINT32 *value, 
-									  UINT32 address,
-									  UINT32 length,
-									  int handle	)
+SCIDK_API NI_RESULT NI_WriteData(uint32_t *value, 
+									  uint32_t length,
+									  uint32_t address,
+									  uint32_t BusMode,
+									  uint32_t timeout_ms,
+								      NI_HANDLE * handle,
+									  uint32_t *written_data)
 {
 	NI_RESULT Status;
-	if (Devices[handle].valid == 1)
+	if (Devices[*handle].valid == 1)
 	{
-		Status = Devices[handle].niSciDK_HAL->WriteToFPGA(value, address, length);
+		Status = Devices[*handle].niSciDK_HAL->WriteToFPGA(value, address, length, BusMode, timeout_ms);
+		*written_data = length;
 		return Status;
 	}
 	else
@@ -132,15 +146,21 @@ SCIDK_API NI_RESULT NI_WriteData(UINT32 *value,
 	}
 }
 
-SCIDK_API NI_RESULT NI_ReadData(UINT32 *value, 
-									  UINT32 address,
-									  UINT32 length,
-									  int handle	)
+SCIDK_API NI_RESULT NI_ReadData(uint32_t *value, 
+									  uint32_t length,
+									  uint32_t address,
+									  uint32_t BusMode,
+									  uint32_t timeout_ms,
+									  NI_HANDLE * handle,
+									  uint32_t *read_data,
+									  uint32_t *valid_data)
 {
 	NI_RESULT Status;
-	if (Devices[handle].valid == 1)
+	if (Devices[*handle].valid == 1)
 	{
-		Status = Devices[handle].niSciDK_HAL->ReadFromFPGA(value, address, length);
+		Status = Devices[*handle].niSciDK_HAL->ReadFromFPGA(value, address, length, BusMode, timeout_ms);
+		*read_data = length;
+		*valid_data = length;
 		return Status;
 	}
 	else
@@ -150,5 +170,22 @@ SCIDK_API NI_RESULT NI_ReadData(UINT32 *value,
 }
 
 
-
-
+SCIDK_API NI_RESULT NI_IICUser_OpenController(uint32_t ControlAddress, uint32_t StatusAddress, NI_HANDLE * handle, NI_IIC_HANDLE *IIC_Handle)
+{
+	return NI_ERROR_GENERIC;
+}
+SCIDK_API NI_RESULT NI_IICUser_ReadData(uint8_t address, uint8_t *value, int32_t len, uint8_t *value_read, int32_t len_read, NI_IIC_HANDLE *IIC_Handle)
+{
+	return NI_ERROR_GENERIC;
+}
+SCIDK_API NI_RESULT  NI_IICUser_WriteData(uint8_t address,
+	uint8_t *value,
+	int32_t len,
+	NI_IIC_HANDLE *IIC_Handle)
+{
+	return NI_ERROR_GENERIC;
+}
+SCIDK_API char *ReadFirmwareInformationApp(NI_HANDLE * handle)
+{
+	return "SCIDK-TEST";
+}
