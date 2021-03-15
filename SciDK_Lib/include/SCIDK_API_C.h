@@ -81,6 +81,10 @@ SCIDK_API NI_RESULT NI_IICUser_WriteData(uint8_t address,
 	int32_t len, 
 	NI_IIC_HANDLE *IIC_Handle);
 SCIDK_API char *ReadFirmwareInformationApp(NI_HANDLE * handle);
+
+SCIDK_API NI_RESULT ActivateEEPROM(char *key, uint32_t sn, NI_HANDLE *handle);
+SCIDK_API NI_RESULT ActivateRAM(char *key, uint32_t sn, NI_HANDLE *handle);
+SCIDK_API NI_RESULT ReadLicenseInfo(char *DNA, uint32_t *sn, bool *Activated, bool *inGracePeriod, int *GraceSeconds, NI_HANDLE *handle);
 #ifdef __cplusplus
 }
 #endif

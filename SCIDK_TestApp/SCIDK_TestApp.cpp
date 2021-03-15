@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "../SciDK_Lib/include/SCIDK_API_C.h"
 
+
 #define SCI_REG_ALL_FIFO_RESET 0xFFFFF908
 #define SCI_REG_counts 0x0001000C
 #define SCI_REG_res 0x0001000D
@@ -27,6 +28,24 @@ int OSCILLOSCOPE_Oscilloscope_0_START(NI_HANDLE *handle);
 int CPACK_CP_0_START(NI_HANDLE *handle);
 int CPACK_CP_0_DOWNLOAD(uint32_t *val, uint32_t size, int32_t timeout, NI_HANDLE *handle, uint32_t *read_data, uint32_t *valid_data);
 
+void PrintLicenseInformation(NI_HANDLE *handle) {
+	char DNA[32];
+	uint32_t sn;
+	bool Activated;
+	bool inGracePeriod;
+	int GraceSeconds;
+	ReadLicenseInfo(DNA, &sn, &Activated, &inGracePeriod, &GraceSeconds, handle);
+	printf("--------------------------------------------------\n");
+	printf("- DNA:         %s\n", DNA);
+	printf("- SN:          %d\n", sn);
+	printf("- ACTIVATED:   %s\n", Activated ? "yes" : "no");
+	if (!Activated) {
+	printf("- GRACE:       %s\n", inGracePeriod ? "yes" : "expired");
+	printf("- GRACE (s):   %d\n", GraceSeconds);
+	}
+	printf("--------------------------------------------------\n");
+}
+
 int main()
 {
 	uint32_t reg_value;
@@ -45,6 +64,16 @@ int main()
 	{
 		if (SCIDK_ConnectUSB("0001", handle) == NI_OK)
 		{
+			
+			PrintLicenseInformation(handle);
+
+			if (ActivateEEPROM("d9b6d892f0329962639556fa96cf14ba", 1, handle) == NI_OK) {
+				PrintLicenseInformation(handle);
+			}
+			else {
+				printf("Invalid Key\n");
+			}
+
 			NI_ReadReg(&reg_value, 0xFFFFFFFF, handle);
 			printf("Reg value: %X\n", reg_value);
 			NI_WriteReg(0x0FF, 0, handle);

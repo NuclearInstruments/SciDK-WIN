@@ -14,6 +14,7 @@ typedef uint32_t	NI_RESULT;
 #define		NI_NO_DATA_AVAILABLE					0x00000006
 #define		NI_TOO_MANY_DEVICES_CONNECTED			0x00000007
 #define		NI_INVALID_HANDLE						0x00000008
+#define		NI_INVALID_KEY							0x00000009
 
 typedef uint32_t	NI_STATUS;
 #define		NI_ONLINE				0x00000000
