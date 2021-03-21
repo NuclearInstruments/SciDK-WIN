@@ -65,14 +65,7 @@ int main()
 		if (SCIDK_ConnectUSB("0001", handle) == NI_OK)
 		{
 			
-			PrintLicenseInformation(handle);
 
-			if (ActivateEEPROM("d9b6d892f0329962639556fa96cf14ba", 1, handle) == NI_OK) {
-				PrintLicenseInformation(handle);
-			}
-			else {
-				printf("Invalid Key\n");
-			}
 
 			NI_ReadReg(&reg_value, 0xFFFFFFFF, handle);
 			printf("Reg value: %X\n", reg_value);

@@ -293,7 +293,7 @@ SCIDK_API NI_RESULT ActivateRAM(char *key, uint32_t sn, NI_HANDLE *handle) {
 SCIDK_API NI_RESULT ReadLicenseInfo(char *DNA, uint32_t *sn, bool *Activated, bool *inGracePeriod, int *GraceSeconds, NI_HANDLE *handle) {
 	const uint32_t RFA_ICAPDNA_EEPROM = 0xFFFFFFFF;
 	uint32_t w,w2;
-
+	uint32_t s;
 	if (NI_WriteReg(0x1 << 28, RFA_ICAPDNA_EEPROM, handle) != 0)
 		return -1;
 
@@ -302,8 +302,9 @@ SCIDK_API NI_RESULT ReadLicenseInfo(char *DNA, uint32_t *sn, bool *Activated, bo
 
 	*Activated = (w >> 17) & 0x1;
 	*inGracePeriod = (w >> 16) & 0x1;
-	*GraceSeconds = (w & 0xFFFF);
-	*GraceSeconds = (*GraceSeconds << 16) / 3250000;
+	s = (w & 0xFFFF);
+	s = (s << 16L) / 3250000;
+	*GraceSeconds = s;
 
 	if (NI_WriteReg(0x2 << 28, RFA_ICAPDNA_EEPROM, handle) != 0)
 		return -1;
@@ -326,3 +327,19 @@ SCIDK_API NI_RESULT ReadLicenseInfo(char *DNA, uint32_t *sn, bool *Activated, bo
 	return 0;
 
 }
+
+/*
+How to license a product
+
+DO NOT EXECUTE ON A PRODUCT ALREADY LICENSED
+
+PrintLicenseInformation(handle);
+
+if (ActivateEEPROM("955a5d74505ee3e0dc8015ca55f2e44e", 1, handle) == NI_OK) {
+PrintLicenseInformation(handle);
+}
+else {
+printf("Invalid Key\n");
+}
+
+*/
