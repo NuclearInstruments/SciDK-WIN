@@ -66,7 +66,7 @@ int main()
 		{
 			
 
-
+			PrintLicenseInformation(handle);
 			NI_ReadReg(&reg_value, 0xFFFFFFFF, handle);
 			printf("Reg value: %X\n", reg_value);
 			NI_WriteReg(0x0FF, 0, handle);
