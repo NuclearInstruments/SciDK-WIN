@@ -11,7 +11,7 @@ namespace NIUSBPHY
 	NI_RESULT OpenDeviceBySerialNumber (char *SN);
 	NI_RESULT CloseConnection ();
 	NI_RESULT WriteToFPGA(unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms);
-	NI_RESULT ReadFromFPGA(unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms);
+	NI_RESULT ReadFromFPGA(unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms, unsigned int *rd);
 	NI_RESULT WriteReg (unsigned int regVal, unsigned int addr);
 	NI_RESULT ReadReg (unsigned int *regVal, unsigned int addr);
 	private:

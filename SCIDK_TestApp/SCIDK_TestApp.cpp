@@ -62,10 +62,18 @@ int main()
 
 	if (found_devs > 0)
 	{
-		if (SCIDK_ConnectUSB("0001", handle) == NI_OK)
+		if (SCIDK_ConnectUSB("0004", handle) == NI_OK)
 		{
-			
+			/*
+			//Example to read from digitizer
+			NI_WriteReg( 1000000, 0x0,  handle);
+			NI_WriteReg( 100, 0x5, handle);
+			NI_WriteReg( 2 + (2 << 8), 0x4, handle);
+			NI_WriteReg( 0 + (2 << 8), 0x4, handle);
+			NI_WriteReg( 1 + (2<<8), 0x4, handle);
 
+			int res = NI_ReadFIFO(data, 10000, 0x2, 1, 100, handle, &rd, &vd);*/
+			
 			PrintLicenseInformation(handle);
 			NI_ReadReg(&reg_value, 0xFFFFFFFF, handle);
 			printf("Reg value: %X\n", reg_value);

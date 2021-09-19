@@ -156,12 +156,39 @@ SCIDK_API NI_RESULT NI_ReadData(uint32_t *value,
 									  uint32_t *read_data,
 									  uint32_t *valid_data)
 {
+	uint32_t rd;
 	NI_RESULT Status;
 	if (Devices[*handle].valid == 1)
 	{
-		Status = Devices[*handle].niSciDK_HAL->ReadFromFPGA(value, address, length, BusMode, timeout_ms);
+		Status = Devices[*handle].niSciDK_HAL->ReadFromFPGA(value, address, length, BusMode, 0, &rd);
 		*read_data = length;
 		*valid_data = length;
+		return Status;
+	}
+	else
+	{
+		return NI_INVALID_HANDLE;
+	}
+}
+
+
+
+SCIDK_API NI_RESULT NI_ReadFIFO(uint32_t *value,
+	uint32_t length,
+	uint32_t address,
+	uint32_t BusMode,
+	uint32_t timeout_ms,
+	NI_HANDLE * handle,
+	uint32_t *read_data,
+	uint32_t *valid_data)
+{
+	uint32_t rd;
+	NI_RESULT Status;
+	if (Devices[*handle].valid == 1)
+	{
+		Status = Devices[*handle].niSciDK_HAL->ReadFromFPGA(value, address, length, BusMode, timeout_ms, &rd);
+		*read_data = rd;
+		*valid_data = rd;
 		return Status;
 	}
 	else

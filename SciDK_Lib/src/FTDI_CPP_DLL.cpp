@@ -176,7 +176,7 @@ NI_RESULT NI_USBPHY::WriteToFPGA (unsigned int *d, unsigned int addr, unsigned i
 }
 
 
-NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms)
+NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned int length, unsigned int BusMode, unsigned int timeout_ms, unsigned int *rd)
 {
 		unsigned char h[200];
 		unsigned int ll;
@@ -204,14 +204,19 @@ NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned 
 		ll = length -1;
 		aa = addr;
 
+		if (timeout_ms > 0xFFFF) timeout_ms = 0xFFFF;
 		//HEADER PACCHETTO
 		h[0] = 0xFF;
-		h[1] = 0x00;
-		h[2] = 0xAB;
+		h[1] = timeout_ms & 0xFF; 
+		h[2] = timeout_ms >> 8;
 		if (BusMode == 0)
 			h[3] = 0xF1;
 		else
 			h[3] = 0xF3;
+
+		if (timeout_ms > 0) {
+			h[3] = h[3] | 0x4;
+		}
 
 		h[4] = (aa >> 24) & 0xFF;
 		h[5] = (aa >> 16) & 0xFF;
@@ -226,8 +231,13 @@ NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned 
 		if(FT_Write(ftHandle,h,11, &bytewritten))
 			return NI_ERROR_INTERFACE;
 
+		if (timeout_ms > 0) {
+			translen += 4;
+		}
+
 		do
 		{
+
 			if(FT_Read(ftHandle,&d_byte[currentpointer],translen, &byteread))
 				return NI_ERROR_INTERFACE;
 			translen = translen - byteread;
@@ -235,20 +245,29 @@ NI_RESULT NI_USBPHY::ReadFromFPGA (unsigned int *d, unsigned int addr, unsigned 
 			wbtot++;
 		}while(translen > 0);
 
+		if (timeout_ms > 0) {
+			uint32_t written_word = *((uint32_t *)(d_byte + 4 * length));
+			*rd = written_word;
+		}
+		else
+		{
+			*rd = length;
+		}
+
 
 		return NI_OK;
 }
 NI_RESULT NI_USBPHY::WriteReg (unsigned int regVal, unsigned int addr)
 {
 
-	return WriteToFPGA(&regVal, addr,1,0,1);
+	return WriteToFPGA(&regVal, addr,1,0,0);
 
 }
 
 NI_RESULT NI_USBPHY::ReadReg (unsigned int *regVal, unsigned int addr)
 {
-
-	return ReadFromFPGA(regVal, addr,1, 0, 4);
+	unsigned int rd;
+	return ReadFromFPGA(regVal, addr,1, 0,0, &rd);
 
 }
 
